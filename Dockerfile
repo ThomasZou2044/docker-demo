@@ -1,5 +1,5 @@
 # 使用Maven OpenJDK Docker镜像作为构建环境
-FROM maven:3.8.1-openjdk-11-slim AS build
+FROM maven:3.8.1-openjdk-17-slim AS build
 
 # 复制pom.xml和源代码到Docker环境中
 COPY ./pom.xml ./pom.xml
