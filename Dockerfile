@@ -1,6 +1,7 @@
 # 使用基础镜像，可以根据你的需求选择不同的基础镜像
 FROM openjdk:11-jdk
-
+RUN apt-get update && \
+    apt-get install -y maven
 # 设置工作目录
 WORKDIR /app
 
@@ -8,7 +9,7 @@ WORKDIR /app
 COPY . /app
 
 # 构建项目，这里假设你的Spring Boot项目使用的是Maven
-RUN mvn package
+RUN ./mvnw package
 
 # 暴露容器内部的端口，如果你的Spring Boot应用程序使用的是不同的端口，请相应地更改
 EXPOSE 8080
