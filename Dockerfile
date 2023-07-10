@@ -8,7 +8,7 @@ WORKDIR /app
 COPY . /app
 
 # 构建项目，这里假设你的Spring Boot项目使用的是Maven
-RUN ./mvnw package
+RUN mvn package
 
 # 暴露容器内部的端口，如果你的Spring Boot应用程序使用的是不同的端口，请相应地更改
 EXPOSE 8080
