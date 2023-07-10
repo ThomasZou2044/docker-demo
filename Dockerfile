@@ -14,4 +14,4 @@ RUN ./mvnw package
 EXPOSE 8080
 
 # 设置容器启动时执行的命令
-CMD ["java", "-jar", "./target/docker-demo.jar"]
+CMD ["java", "-jar", "./target/docker-demo-0.0.1-SNAPSHOT.jar"]
