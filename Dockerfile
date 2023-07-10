@@ -1,18 +1,18 @@
-# 使用基础镜像，可以根据你的需求选择不同的基础镜像
-FROM openjdk:11-jdk
-RUN apt-get update && \
-    apt-get install -y maven
-# 设置工作目录
-WORKDIR /app
+# 使用Maven OpenJDK Docker镜像作为构建环境
+FROM maven:3.8.1-openjdk-11-slim AS build
 
-# 将构建目录下的所有内容复制到容器的工作目录
-COPY . /app
+# 复制pom.xml和源代码到Docker环境中
+COPY ./pom.xml ./pom.xml
+COPY ./src ./src
 
-# 构建项目，这里假设你的Spring Boot项目使用的是Maven
-RUN ./mvnw package
+# 执行Maven构建命令
+RUN mvn clean package -DskipTests
 
-# 暴露容器内部的端口，如果你的Spring Boot应用程序使用的是不同的端口，请相应地更改
-EXPOSE 8080
+# 使用OpenJDK运行时镜像作为运行环境
+FROM openjdk:11-jre-slim
 
-# 设置容器启动时执行的命令
-CMD ["java", "-jar", "./target/docker-demo-0.0.1-SNAPSHOT.jar"]
+# 复制从构建环境生成的jar文件到运行环境中
+COPY --from=build /target/*.jar app.jar
+
+# 运行Spring Boot应用
+ENTRYPOINT ["java","-jar","/app.jar"]
