@@ -8,14 +8,14 @@ CCFlow API 原理及实现
 ## 创建Flow模板流程 
 创建Flow模板流程的过程比较简单，新建的模板只有两个默认节点，如下图所示
 ![new_nde.png](new_node.png)
-### 新建的流程如下
+### 新建Flow的流程如下
 * 首先查询当前的Flow_Mark，`@FlowMark=d8` 是当前的Mark ID 用来校验是否已经存在当前Mark
 ```
 Handler.ashx?DoType=Entities_Init&EnsName=BP.WF.Flows&Paras=@FlowMark=d8&t=1690421815756
 ```
 * 第二步调用`Defualt_NewFlow`，传入下面的参数
 ![new_flow_param.png](new_flow_param.png)  
-并在执行下面的方法
+    并在执行下面的方法
 ```C#
 public string Defualt_NewFlow()
     {
