@@ -83,7 +83,9 @@ nd.ICON = "フロント";
 ```
 ## 保存Flow时的操作
 假设此时我们的流程结构如下图所示
+
 ![save_new.png](save_new.png)
+  
 那么此时点击保存按钮，浏览器会调用 Designer_Save 方法
 这时候的参数，期中Node代表所有的节点， Dirs代表方向
 ```
