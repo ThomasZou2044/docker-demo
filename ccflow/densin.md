@@ -14,8 +14,9 @@ CCFlow API 原理及实现
 Handler.ashx?DoType=Entities_Init&EnsName=BP.WF.Flows&Paras=@FlowMark=d8&t=1690421815756
 ```
 * 第二步调用`Defualt_NewFlow`，传入下面的参数
+
 ![new_flow_param.png](new_flow_param.png)  
-    并在执行下面的方法
+并在执行下面的方法
 ```C#
 public string Defualt_NewFlow()
     {
