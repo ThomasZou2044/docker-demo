@@ -2,9 +2,9 @@ CCFlow API 原理及实现
 ===========================
 `CCFlow`的核心API设计在官方文档中并未设计，只做了核心表的 [简介](https://gitee.com/opencc/JFlow/wikis/%E5%AE%89%E8%A3%85&%E9%9B%86%E6%88%90/%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E8%A1%A8/%E6%B5%81%E7%A8%8B%E6%A8%A1%E6%9D%BF%E8%A1%A8)，这里写一篇文章，对`CCFlow`核心API进行相关梳理 
 # 目录
-- [创建Flow模板流程](#创建flow模板流程-)
-- [保存Flow时的操作](#保存Flow时的操作-)
-- [Create Node的具体实现](#Create Node的具体实现-)
+- [创建Flow模板流程](#创建flow模板流程)
+- [保存Flow时的操作](#保存Flow时的操作)
+- [Create Node的具体实现](#CreateNode的具体实现)
 ## 创建Flow模板流程 
 创建Flow模板流程的过程比较简单，新建的模板只有两个默认节点，如下团所示
 ![new_nde.png](new_node.png)
@@ -122,7 +122,7 @@ foreach (string item in dirs)
 // 运行SQL
 DBAccess.RunSQLs(sBuilder.ToString());
 ```
-## Create Node的具体实现
+## CreateNode的具体实现
 当我们使用右键新规Node时![new_node_menue.png](new_node_menue.png)
 会调用Create_Node()方法，并且传入Node的相关参数
 ```
