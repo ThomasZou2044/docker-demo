@@ -87,7 +87,7 @@ nd.ICON = "フロント";
 ![save_new.png](save_new.png)
   
 那么此时点击保存按钮，浏览器会调用 Designer_Save 方法
-这时候的参数，期中Node代表所有的节点， Dirs代表方向
+这时候的参数，其中Node代表所有的节点， Dirs代表方向
 ```
 Nodes: @1801,198,120@1802,200,250@1803,446,242@1804,446,132
 Dirs: @018_1801_1802,018,1801,1802@018_1801_1804,018,1801,1804@018_1802_1803,018,1802,1803
@@ -127,7 +127,10 @@ foreach (string item in dirs)
 DBAccess.RunSQLs(sBuilder.ToString());
 ```
 ## CreateNode的具体实现
-当我们使用右键新规Node时![new_node_menue.png](new_node_menue.png)
+当我们使用右键新规Node时
+
+![new_node_menue.png](new_node_menue.png)
+
 会调用Create_Node()方法，并且传入Node的相关参数
 ```
 X: 145
