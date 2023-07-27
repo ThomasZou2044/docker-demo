@@ -179,7 +179,11 @@ public string CreateNode()
             return this.RunSQL(this.SQLCash.Insert.Replace("[", "").Replace("]", ""), SqlBuilder.GenerParas(this, null));
     }
 ```
-并且操作完成之后会刷新缓存
+`this.SQLCash.Insert`中物理逻辑的表名是`WF_NODE`，是在系统启动后，在渲染GUI页面时会进行自动的注入，如下图所示
+
+![1_table_name.png](1_table_name.png)
+
+并且写入数据库操作完成之后会刷新缓存
 ```
 // 开始更新内存数据。 @wangyanyan
 if (this.EnMap.DepositaryOfEntity == Depositary.Application)
