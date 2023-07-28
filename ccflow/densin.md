@@ -192,3 +192,153 @@ if (this.EnMap.DepositaryOfEntity == Depositary.Application)
 this.afterInsert();
 this.afterInsertUpdateAction();
 ```
+## 获取工作流
+通过`WF_DensinList`下的`GetDensinList`获取工作流数据接口，传入的参数`listType: 6;5;4`分别代表
+```
+public const string GET_MY_COMPLETE = "0";      　　　// 自分を見るの完了
+public const string GET_MY_UNCOMPLETE = "1";    　　　// 自分を見るの未完了
+public const string GET_MY_DIFFERENCE = "2";    　　　// 自分を見るの差戻
+public const string GET_MY_DRAFT = "3";         　　　// 自分を見るの下書き
+public const string GET_APPROVAL_COMPLETE = "4";      // 承認依頼を見るの完了
+public const string GET_APPROVAL_UNCOMPLETE = "5";    // 承認依頼を見るの未完了
+public const string GET_APPROVAL_INPROCESS = "6";     // 承認依頼を見るの処理待ち
+```
+首先会根据传入的参数进行不同的查询，这里我们用`承認依頼を見るの処理待ち`举例，此时会进入`GET_APPROVAL_INPROCESS`分支
+```
+ switch (listType[i])
+    {
+        // 自分を見るの完了一覧取得
+        case GET_MY_COMPLETE:
+            // 絞り込み条件作成
+            selectKey = string.Format(" Starter = '{0}'", WebUser.No);
+            //データ取得
+            dtRtn = GetCompleteList(selectKey, COMPLETE_SORT_KEY,GET_MY_COMPLETE, btnNasiList);
+            break;
+        // 自分を見るの未完了
+        case GET_MY_UNCOMPLETE:
+            // 絞り込み条件作成
+            selectKey = string.Format(" Starter = '{0}'", WebUser.No);
+            //データ取得
+            dtRtn = GetUnCompleteList(selectKey, COMPLETE_SORT_KEY,GET_MY_UNCOMPLETE, btnNasiList);
+            break;
+        // 自分を見るの差戻
+        case GET_MY_DIFFERENCE:
+            // 絞り込み条件作成
+            selectKey = string.Format(" WFState = {0} AND Starter = '{1}'", WF_STATE_BACK, WebUser.No);
+            //データ取得
+            dtRtn = GetTodolist(selectKey, SORT_KEY,GET_MY_DIFFERENCE, btnNasiList);
+            break;
+        // 自分を見るの下書き
+        case GET_MY_DRAFT:
+            // 絞り込み条件作成
+            selectKey = string.Format(" (WFState = {0} OR WFState = {1}) AND Starter = '{2}'", WF_STATE_DRAFT, WF_STATE_SINSEIZUMI, WebUser.No);
+            //データ取得
+            dtRtn = GetTodolist(selectKey, SORT_KEY,GET_MY_DRAFT, btnNasiList);
+            break;
+        // 承認依頼を見るの完了
+        case GET_APPROVAL_COMPLETE:
+            //絞り込み条件作成
+            selectKey = string.Format(" Starter <> '{0}'", WebUser.No);
+            //データ取得
+            dtRtn = GetCompleteList(selectKey, SEND_DESC_SORT_KEY, GET_APPROVAL_COMPLETE, btnNasiList);
+            break;
+        // 承認依頼を見るの未完了
+        case GET_APPROVAL_UNCOMPLETE:
+            // 絞り込み条件作成
+            selectKey = string.Format(" Starter <> '{0}' AND FK_Node > CurrNode", WebUser.No);
+            //データ取得
+            dtRtn = GetUnCompleteList(selectKey, COMPLETE_SORT_KEY, GET_APPROVAL_UNCOMPLETE, btnNasiList);
+            break;
+        // 承認依頼を見るの処理待ち
+        case GET_APPROVAL_INPROCESS:
+            // 絞り込み条件作成
+            selectKey = string.Format(" (WFState = {0} OR WFState = {1}) AND Starter <> '{2}'", WF_STATE_SINSEIZUMI, WF_STATE_BACK, WebUser.No);
+            //データ取得
+            dtRtn = GetTodolist(selectKey, APPROVAL_WAITE_ASC_SORT_KEY, GET_APPROVAL_INPROCESS, btnNasiList);
+            break;
+    }
+```
+再调用`GetTodoList`
+```
+ string fk_node = this.GetRequestVal("FK_Node");
+                string showWhat = this.GetRequestVal("ShowWhat");
+                dt = SelectCommonDataTable(DB_GenerEmpWorksOfDataTable(WebUser.No, this.FK_Node, showWhat), selectKey, sort,type, btnNasiList);
+```
+方法在此方法中`DB_GenerEmpWorksOfDataTable()`会去查询当前的人员相关的flow数量
+```
+ if (fk_node == 0)
+{
+    ps.SQL = "SELECT A.* ,F.*,OU.ORDER_NUMBER FROM WF_EmpWorks A left join WF_Flow AS F on A.FK_Flow =F.No LEFT JOIN TT_WF_ORDER_NUMBER AS OU ON A.WorkID = OU.OID WHERE FK_Emp=" + dbstr + "FK_Emp AND TaskSta=0 AND " + wfStateSql + " ORDER BY  ADT DESC ";
+    ps.Add("FK_Emp", userNo);
+}
+else
+{
+    ps.SQL = "SELECT A.* ,F.PTable ,OU.ORDER_NUMBER FROM WF_EmpWorks A left join WF_Flow AS F on A.FK_Flow =F.No LEFT JOIN TT_WF_ORDER_NUMBER AS OU ON A.WorkID = OU.OID WHERE FK_Emp=" + dbstr + "FK_Emp AND TaskSta=0 AND FK_Node=" + dbstr + "FK_Node  AND " + wfStateSql + " ORDER BY  ADT DESC ";
+    ps.Add("FK_Node", fk_node);
+    ps.Add("FK_Emp", userNo);
+}
+// 实际的SQL
+SELECT A.* , F.*, OU.ORDER_NUMBER
+FROM WF_EmpWorks A left join WF_Flow AS F on A.FK_Flow =F.No LEFT JOIN TT_WF_ORDER_NUMBER AS OU ON A.WorkID = OU.OID
+WHERE FK_Emp=0210069 AND TaskSta=0 AND A.WFState!=10
+ORDER BY  ADT DESC ;
+```
+其中的`WF_EmpWorks`是一个View表记录了用户和Work的一一对应的关系，我们需要的字段会在`SelectCommonDataTable()`中用到，在`SelectCommonDataTable`中我们使用
+```
+ public DataTable SelectCommonDataTable( DataTable dt ,string selectKey,string sort,string type, List<string> btnNasiList)
+{
+    StringBuilder logBuilder = new StringBuilder();
+
+    // トランザクションテーブルSQL
+    StringBuilder sqlsb = new StringBuilder();
+
+    // トランザクションテーブル情報の取得
+    int cnt = dt.Rows.Count;
+    for (int i = 0; i < cnt; i++)
+    {
+        DataRow row = dt.Rows[i];
+        sqlsb.Append("SELECT '");
+        // 我们需要WorkID
+        sqlsb.Append(row["WorkID"].ToString());
+        sqlsb.Append("' as WorkID, SUMMRY, FlowStarter, FlowEnder FROM ");
+        sqlsb.Append(row["PTable"].ToString());
+        sqlsb.Append("  WHERE OID = ");
+        sqlsb.Append(row["WorkID"].ToString());
+        if (i == cnt - 1)
+        {
+            break;
+        }
+        sqlsb.Append(" union all ");
+    }
+    DataTable dtTran = DBAccess.RunSQLReturnTable(sqlsb.ToString());
+    ......将查询出的数据进行处理，并返回前台
+}
+
+
+```
+在SelectCommonDataTable()中，我们需要`WorkID`，`PTable`最后生成的SQL语句为
+```
+SELECT '143' as WorkID, SUMMRY, FlowStarter, FlowEnder
+FROM TT_WF_ORDER
+WHERE OID = 143
+union all
+SELECT '138' as WorkID, SUMMRY, FlowStarter, FlowEnder
+FROM TT_WF_ORDER
+WHERE OID = 138
+union all
+SELECT '126' as WorkID, SUMMRY, FlowStarter, FlowEnder
+FROM TT_WF_ARRIVAL_RETURNS
+WHERE OID = 126
+union all
+SELECT '122' as WorkID, SUMMRY, FlowStarter, FlowEnder
+FROM TT_WF_ARRIVAL_RETURNS
+WHERE OID = 122
+```
+最后将查询出的数据处理 并返回至前台即可
+
+| workID | SUMMARY | FlowStarter | FlowEnder |
+| ---------- | -----------|-----------|-----------|
+| 143| {"AgentMode":"0","AutoApprovalMode":"N","content":[{"value":"真洲句　優祈音","name":"従業員氏名"},{"value":"0543956","name":"社員番号"},{"value":"イオンアイビス（株）","name":"会社名称"},{"value":"ＤＸシステム開発Ｇ","name":"所属"}]}	 | 0543956 | 0543956 |
+
+
+
