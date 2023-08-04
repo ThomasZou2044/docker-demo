@@ -1,0 +1,20 @@
+version: '3'
+services:
+  web:
+    image: yrzr/gitlab-ce-arm64v8   # GitLab CE 版本
+    container_name: gitlab
+    restart: always
+    hostname: localhost
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url 'http://localhost:8081'
+        gitlab_rails['initial_root_password'] = '5545125pP'   # 设置 root 用户密码
+    ports:
+      - "8081:80"
+      - "443:443"
+      - "22:22"
+    volumes:
+      - /Users/yanzou/gitlab/config:/etc/gitlab
+      - /Users/yanzou/gitlab/logs:/var/log/gitlab
+      - /Users/yanzou/gitlab/data:/var/opt/gitlab
+

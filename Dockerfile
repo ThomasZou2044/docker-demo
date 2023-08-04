@@ -9,10 +9,10 @@ COPY ./src ./src
 RUN mvn clean package -DskipTests
 
 # 使用OpenJDK运行时镜像作为运行环境
-FROM openjdk:17-jre-slim
+FROM openjdk:11-jre-slim
 
 # 复制从构建环境生成的jar文件到运行环境中
-COPY --from=build /target/*.jar app.jar
+COPY --from=build /target/*.jar docker-demo.jar
 
 # 运行Spring Boot应用
 ENTRYPOINT ["java","-jar","/app.jar"]
