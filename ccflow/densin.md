@@ -7,7 +7,7 @@ CCFlow API 原理及实现
 - [Create Node的具体实现](#CreateNode的具体实现)
 ## 创建Flow模板流程 
 创建Flow模板流程的过程比较简单，新建的模板只有两个默认节点，如下图所示
-![new_nde.png](new_node.png)
+![new_nde.png](img/new_node.png)
 ### 新建Flow的流程如下
 * 首先查询当前的Flow_Mark，`@FlowMark=d8` 是当前的Mark ID 用来校验是否已经存在当前Mark
 ```
@@ -15,7 +15,7 @@ Handler.ashx?DoType=Entities_Init&EnsName=BP.WF.Flows&Paras=@FlowMark=d8&t=16904
 ```
 * 第二步调用`Defualt_NewFlow`，传入下面的参数
 
-![new_flow_param.png](new_flow_param.png)  
+![new_flow_param.png](img/new_flow_param.png)  
 并在执行下面的方法
 ```C#
 public string Defualt_NewFlow()
@@ -84,7 +84,7 @@ nd.ICON = "フロント";
 ## 保存Flow时的操作
 假设此时我们的流程结构如下图所示
 
-![save_new.png](save_new.png)
+![save_new.png](img/save_new.png)
   
 那么此时点击保存按钮，浏览器会调用 Designer_Save 方法
 这时候的参数，其中Node代表所有的节点， Dirs代表方向
@@ -129,7 +129,7 @@ DBAccess.RunSQLs(sBuilder.ToString());
 ## CreateNode的具体实现
 当我们使用右键新规Node时
 
-![new_node_menue.png](new_node_menue.png)
+![new_node_menue.png](img/new_node_menue.png)
 
 会调用Create_Node()方法，并且传入Node的相关参数
 ```
@@ -181,7 +181,7 @@ public string CreateNode()
 ```
 `this.SQLCash.Insert`中物理逻辑的表名是`WF_NODE`，是在系统启动后，在渲染GUI页面时会进行自动的注入，如下图所示
 
-![1_table_name.png](1_table_name.png)
+![1_table_name.png](img/1_table_name.png)
 
 并且写入数据库操作完成之后会刷新缓存
 ```
