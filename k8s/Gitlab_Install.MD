@@ -30,11 +30,11 @@ helm install my-gitlab -f value-gitlab.yml   --namespace gitlab
 helm pull  gitlab/gitla
 ```
 下载后的Chart是一个tar文件，解压后即可得到Chart仓库，如下图所示
-![img.png](img.png)  
+![img.png](img/img.png)  
 此时我们对Gitlab以来的组件下的values.yaml进行修改即可，修改后，通过指令
 ```
 helm install my-gitlab . 
 ```
 其中点代表当下目录的chart，会自动的运行安装最后结果如下所示
-![img_1.png](img_1.png)
-![img_2.png](img_2.png)
+![img_1.png](img/img_1.png)
+![img_2.png](img/img_2.png)
